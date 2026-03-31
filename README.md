@@ -23,4 +23,4 @@ Or with a local server:
 ## What you'll get
 
 - A first page with a Mandelbrot Explorer, all coded in Rust and real-time executed thanks to Wasm.
-- A second page with a Physics Engine renderer (Rapier2D) to simulate falling balls with colliosions. All done in Rust and Wasm.
+- A second page with a Physics Engine renderer (Rapier2D) to simulate falling balls with collisions. All done in Rust and Wasm.
