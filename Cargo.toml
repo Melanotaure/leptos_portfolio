@@ -1,0 +1,28 @@
+[package]
+name = "leptos_portfolio"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+leptos = { version = "0.6", features = ["csr"] }
+leptos_router = { version = "0.6", features = ["csr"] }
+rapier2d = "0.18"                                       # Le moteur physique
+
+# Dépendances pour interagir avec le navigateur (DOM, Canvas)
+[dependencies.web-sys]
+version = "0.3"
+features = [
+    "Document",
+    "Window",
+    "HtmlElement",
+    "HtmlCanvasElement",
+    "CanvasRenderingContext2d",
+    "Performance",
+    "ImageData",
+]
+
+[dependencies.js-sys]
+version = "0.3"
+
+[dependencies.wasm-bindgen]
+version = "0.2"

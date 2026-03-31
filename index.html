@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Rust & WASM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #111111;
+            /* Deep black / Very dark grey */
+            --bg-card: #1c1c1c;
+            /* Slightly lighter grey for the maps */
+            --nav-bg: rgba(28, 28, 28, 0.8);
+            /* Transparency for nav */
+            --text-main: #f3f2f1;
+            /* Off-white with a hint of warmth */
+            --text-muted: #a39f9d;
+            /* Warm gray */
+            --accent: #e57324;
+            /* The official Rust Orange! */
+            --accent-hover: #cc5c14;
+            /* A slightly darker orange for the hovering */
+            --border-color: #333333;
+            /* Discreet borders */
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        /* --- NAVIGATION --- */
+        nav {
+            background: var(--nav-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 1rem 2rem;
+            /* A little more space at the edges */
+
+            /* We replace Flexbox with Grid for perfect centering */
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .nav-left {
+            text-align: left;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-family: monospace;
+            /* For a cool, slightly technical look */
+        }
+
+        .nav-right {
+            text-align: right;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-family: monospace;
+            /* For a cool, slightly technical look */
+        }
+
+        .nav-logo {
+            justify-content: right;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-logo img {
+            height: 40px;
+            /* Perfect size for the navigation bar */
+            width: auto;
+            transition: transform 0.3s ease;
+            /* Short, smooth animation */
+        }
+
+        /* The crab makes a little jump when you hover the mouse over it! */
+        .nav-logo img:hover {
+            transform: translateY(-5px) rotate(10deg);
+        }
+
+        nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        nav a:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Leptos Router automatically adds this attribute to the active link! */
+        nav a[aria-current="page"] {
+            color: white;
+            background: var(--accent);
+        }
+
+        /* --- CONTAINERS --- */
+        main {
+            padding: 2rem 1rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .card {
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            max-width: 850px;
+            width: 100%;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        h2 {
+            margin-top: 0;
+            font-weight: 800;
+            font-size: 2rem;
+            /* New gradient in the colors of the Rust logo (Orange to Yellow/Gold) */
+            background: linear-gradient(to right, #e57324, #facc15);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+
+            /* For the modern web standard (This is what cancels the warning) */
+            background-clip: text;
+            color: transparent;
+        }
+
+        p {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        /* --- BUTTONS --- */
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            /* Subtle orange drop shadow */
+            box-shadow: 0 4px 6px -1px rgba(229, 115, 36, 0.25);
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            /* The shadow widens slightly upon hovering. */
+            box-shadow: 0 6px 8px -1px rgba(229, 115, 36, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
+        }
+
+        /* --- CANVAS --- */
+        canvas {
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            background: #000;
+            /* Black background by default before loading */
+            max-width: 100%;
+            height: auto;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body></body>
+
+</html>
