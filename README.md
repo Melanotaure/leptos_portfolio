@@ -6,19 +6,18 @@ With the help of trunk, you'll get a "dist" directory that you can copy/paste to
 
 You can also check my site: https://www.tapcul.org to see the final result.
 
-## How to build
-`trunk build --release`
-
-Or with a local server:
-`trunk serve --open --release`
-
 ## Dependencies
 
 - You'll need wasm:
 `rustup target add wasm32-unknown-unknown`
-
 - You'll need TRUNK:
 `cargo install trunk`
+
+## How to build
+`trunk build --release`
+
+Or with a local server (with a preview each time the code is saved):
+`trunk serve --open --release`
 
 ## What you'll get
 
