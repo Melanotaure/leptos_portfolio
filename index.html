@@ -216,6 +216,60 @@
                 transform: translateY(0);
             }
         }
+
+        /* =========================================
+           RESPONSIVE DESIGN (MOBILE PHONES AND TABLETS)
+           ========================================= */
+        @media (max-width: 768px) {
+
+            /* 1. The navigation stacks vertically. */
+            nav {
+                grid-template-columns: 1fr;
+                /* A single column */
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .nav-logo {
+                justify-content: center;
+                /* We center our Ferris crab */
+            }
+
+            .nav-left {
+                justify-content: center;
+                text-align: center;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                /* The buttons will wrap to the next line if needed. */
+                gap: 0.5rem;
+            }
+
+            /* 2. We are reducing the overall margins */
+            main {
+                padding: 1rem 0.5rem;
+            }
+
+            .card {
+                padding: 1rem;
+                /* Less empty space in the cards */
+            }
+
+            h2 {
+                font-size: 1.5rem;
+                /* Titles a little smaller */
+            }
+
+            /* 3. The buttons take up the entire width on mobile. */
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 
