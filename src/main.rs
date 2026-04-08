@@ -1,4 +1,4 @@
-use leptos::ev::MouseEvent;
+use leptos::ev::PointerEvent;
 use leptos::*;
 use leptos_router::*;
 use rapier2d::prelude::*;
@@ -95,6 +95,8 @@ fn MandelbrotPage() -> impl IntoView {
     let (zoom, set_zoom) = create_signal(1.0);
     let (color_offset, set_color_offset) = create_signal(5);
 
+    let (is_zooming_in, set_is_zooming_in) = create_signal(true);
+
     // Effect for drawing the fractal (unchanged)
     create_effect(move |_| {
         if let Some(canvas) = canvas_ref.get() {
@@ -123,33 +125,34 @@ fn MandelbrotPage() -> impl IntoView {
     });
 
     // --- Canvas click handling ---
-    let on_canvas_click = move |ev: MouseEvent| {
-        // 1. Retrieve the click position in pixels (relative to the canvas)
-        let px = ev.offset_x() as f64;
-        let py = ev.offset_y() as f64;
+    let on_canvas_pointerdown = move |ev: PointerEvent| {
+        let canvas = canvas_ref.get().unwrap();
+
+        let scale_x = width as f64 / canvas.client_width() as f64;
+        let scale_y = height as f64 / canvas.client_height() as f64;
+
+        let px = ev.offset_x() as f64 * scale_x;
+        let py = ev.offset_y() as f64 * scale_y;
 
         let w = width as f64;
         let h = height as f64;
         let current_zoom = zoom.get();
 
-        // 2. Calculate the dimensions of the current window in the complex plane
         let aspect_ratio = w / h;
         let x_range = 4.0 / current_zoom * aspect_ratio;
         let y_range = 4.0 / current_zoom;
 
-        let min_x = center_x.get() - x_range / 2.5;
-        let min_y = center_y.get() - y_range / 2.5;
+        let min_x = center_x.get() - x_range / 2.0;
+        let min_y = center_y.get() - y_range / 2.0;
 
-        // 3. Convert pixels (px, py) to complex coordinates (clicked_cx, clicked_cy)
         let clicked_cx = min_x + (px / w) * x_range;
         let clicked_cy = min_y + (py / h) * y_range;
 
-        // 4. Update the center
         set_center_x.set(clicked_cx);
         set_center_y.set(clicked_cy);
 
-        // 5. Zoom in (Normal click) or Zoom out (Shift + Click)
-        if ev.shift_key() {
+        // NOUVEAU : On vérifie si la touche MAJ est enfoncée (PC) OU si le bouton mobile est sur "Dézoomer"
+        if ev.shift_key() || !is_zooming_in.get() {
             set_zoom.update(|z| *z /= 1.5);
         } else {
             set_zoom.update(|z| *z *= 1.5);
@@ -158,27 +161,37 @@ fn MandelbrotPage() -> impl IntoView {
 
     view! {
         <div class="card">
-            <h2>"Mandelbrot Explorer"</h2>
+            <h2>"Explorateur de Mandelbrot"</h2>
             <p>
-                "Calculated in real time using WebAssembly. "<br/>
-                "Click on the image to zoom in. "
-                <strong style="color: white;">"Shift + Click"</strong>" to zoom out."
+                "Calculé en temps réel en WebAssembly. "<br/>
+                "Clique (ou tapote) sur l'image pour explorer."
             </p>
 
             <div class="btn-group">
-                <button class="btn btn-secondary" on:click=move |_| { set_zoom.set(1.0); set_center_x.set(0.0); set_center_y.set(0.625); }>
-                    "Reset View"
+                // Le bouton pour basculer le mode (très pratique sur mobile !)
+                <button
+                    class="btn"
+                    on:click=move |_| set_is_zooming_in.update(|z| *z = !*z)
+                    // On change la couleur dynamiquement pour bien montrer le mode actif
+                    style=move || if is_zooming_in.get() { "background: var(--accent);" } else { "background: #ef4444;" }
+                >
+                    {move || if is_zooming_in.get() { "🔍 Mode : Zoom IN" } else { "🔎 Mode : Zoom OUT" }}
                 </button>
-                <button class="btn" on:click=move |_| set_color_offset.update(|c| *c += 7)>
-                    "Change colors"
+
+                <button class="btn btn-secondary" on:click=move |_| { set_zoom.set(1.0); set_center_x.set(-0.5); set_center_y.set(0.0); }>
+                    "Reset Vue"
+                </button>
+                <button class="btn btn-secondary" on:click=move |_| set_color_offset.update(|c| *c += 7)>
+                    "Couleurs"
                 </button>
             </div>
 
             <canvas
                 node_ref=canvas_ref
-                width=600
-                height=400
-                on:click=on_canvas_click
+                width=width
+                height=height
+                // NOUVEAU : on utilise pointerdown au lieu de click
+                on:pointerdown=on_canvas_pointerdown
                 style="cursor: crosshair;"
             ></canvas>
         </div>
